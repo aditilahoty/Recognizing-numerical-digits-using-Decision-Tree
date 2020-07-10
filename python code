@@ -1,0 +1,36 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier
+
+from sklearn.model_selection import train_test_split
+#constants
+
+IMG_HEIGHT=28
+IMG_WIDTH=28
+import os
+print(os.listdir("../input"))
+
+loaded_images=pd.read_csv('../input/train.csv')
+loaded_images.head()
+
+images=loaded_images.iloc[:,1:]
+labels=loaded_images.iloc[:,:1]   # for the labels to be a dataframe . iloc[:,0] returns a Series  iloc[:,:1] returns a Dataframe
+labels.head()
+train_images,test_images,train_labels,test_labels=train_test_split(images,labels,test_size=0.2,random_state=13)
+train_images.describe()
+
+tree=DecisionTreeClassifier(criterion='gini',random_state=1)
+tree.fit(train_images,train_labels)
+
+tree.score(train_images,train_labels.values.ravel())
+
+tree.score(test_images,test_labels.values.ravel())
+
+figr,axes=plt.subplots(figsize=(10,10),ncols=3,nrows=3)
+axes=axes.flatten()
+for i in range(0,9):
+    jj=np.random.randint(0,test_images.shape[0])          #pick a random image
+    axes[i].imshow(test_images.iloc[[jj]].values.reshape(IMG_HEIGHT,IMG_WIDTH))
+    axes[i].set_title('predicted: '+str(tree.predict(test_images.iloc[[jj]])[0]))
+    
